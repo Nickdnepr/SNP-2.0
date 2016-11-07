@@ -16,7 +16,8 @@
         <ImageView
                 android:layout_width="@dimen/toolbar_height"
                 android:layout_height="match_parent"
-                android:src="@drawable/ic_search_black_48dp"/>
+                android:src="@drawable/ic_search_black_48dp"
+                android:id="@+id/search_button"/>
     </LinearLayout>
 
     <android.support.v7.widget.RecyclerView

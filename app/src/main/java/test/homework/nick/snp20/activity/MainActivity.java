@@ -1,5 +1,6 @@
 package test.homework.nick.snp20.activity;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.NavigationView;
@@ -12,16 +13,25 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 import test.homework.nick.snp20.R;
+import test.homework.nick.snp20.events_for_eventbus.EventToActivity;
+import test.homework.nick.snp20.events_for_eventbus.ListEvent;
 import test.homework.nick.snp20.fragments.BottomSheetTestingFragment;
+import test.homework.nick.snp20.fragments.SearchPlayerFragment;
+import test.homework.nick.snp20.services.PlayerService;
+import test.homework.nick.snp20.utils.Commands;
 
-import java.util.List;
-
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private boolean bottomSheetExtended = false;
+    private boolean musicPlaying = false;
+    private boolean serviceAlive = false;
+    private ListEvent reservePlaylist;
 
     private FrameLayout fragmentContent;
     private LinearLayout bottom_panel;
@@ -30,15 +40,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Toolbar toolbar;
     private TextView toolbarContext;
     private NavigationView navigationView;
+    private ImageView pauseAndPlayBottomButton;
+    private ImageView nextBottomButton;
+    private ImageView previousBottomButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        EventBus.getDefault().register(this);
         initControlElements();
         setupControlElements();
         BottomSheetTestingFragment fragment = new BottomSheetTestingFragment();
-        changeFragment(fragment);
+        SearchPlayerFragment searchPlayerFragment=new SearchPlayerFragment();
+        changeFragment(searchPlayerFragment);
     }
 
     //initializing all control elements from xml, like layouts, buttons, textViews, toolbar, etc.
@@ -50,7 +65,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         fragmentContent = (FrameLayout) findViewById(R.id.fragmentHost);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbarContext = (TextView) findViewById(R.id.text_in_toolbar);
-        navigationView= (NavigationView) findViewById(R.id.navigation_drawer);
+        navigationView = (NavigationView) findViewById(R.id.navigation_drawer);
+        pauseAndPlayBottomButton = (ImageView) findViewById(R.id.bottom_panel_pause_start_button);
+        nextBottomButton = (ImageView) findViewById(R.id.bottom_panel_next_button);
+        previousBottomButton = (ImageView) findViewById(R.id.bottom_panel_previous_button);
     }
 
 
@@ -110,6 +128,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         getSupportFragmentManager().beginTransaction().replace(R.id.fragmentHost, fragment).commit();
     }
 
+    private void startService(boolean startMusic) {
+        Intent intent = new Intent(MainActivity.this, PlayerService.class);
+        startService(intent);
+        if (startMusic){
+
+        }
+    }
+
 
     public void openSheet() {
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
@@ -121,8 +147,47 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         bottomSheetExtended = false;
     }
 
+    @Subscribe
+    public void onEvent(EventToActivity eventToActivity) {
+        if (eventToActivity.getMessage().equals(Commands.START_COMMAND)) {
+            openSheet();
+            musicPlaying = true;
+        }
+
+        if (eventToActivity.getMessage().equals(Commands.STOP_COMMAND)) {
+            musicPlaying = false;
+
+        }
+
+        if (eventToActivity.getMessage().equals(Commands.SERVICE_START)) {
+            serviceAlive=true;
+        }
+
+        if (eventToActivity.getMessage().equals(Commands.SERVICE_DESTROY)) {
+            closeSheet();
+            musicPlaying = false;
+            serviceAlive=false;
+        }
+
+
+    }
+
+    @Subscribe
+    public void onEvent(ListEvent listEvent){
+        reservePlaylist=listEvent;
+        if (!serviceAlive){
+            startService(true);
+        }
+    }
+
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         return true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
     }
 }
