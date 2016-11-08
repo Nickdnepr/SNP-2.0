@@ -1,6 +1,7 @@
 package test.homework.nick.snp20.utils;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ import java.util.List;
  */
 public class MRecyclerAdapter extends RecyclerView.Adapter<MRecyclerAdapter.MViewHolder> {
 
+    public static final String TAG = "mRecyclerAdapter";
     private List<Info> playlist;
 
     public MRecyclerAdapter(List<Info> playlist) {
@@ -57,12 +59,14 @@ public class MRecyclerAdapter extends RecyclerView.Adapter<MRecyclerAdapter.MVie
 
         public MViewHolder(View itemView) {
             super(itemView);
-            time= (TextView) itemView.findViewById(R.id.list_item_track_duration);
-            title= (TextView) itemView.findViewById(R.id.list_item_track_name);
+            time = (TextView) itemView.findViewById(R.id.list_item_track_duration);
+            title = (TextView) itemView.findViewById(R.id.list_item_track_name);
+            itemView.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
+            Log.i(TAG, "clicked, id="+getAdapterPosition());
             EventBus.getDefault().post(new ListEvent(playlist, getAdapterPosition(), true));
         }
     }

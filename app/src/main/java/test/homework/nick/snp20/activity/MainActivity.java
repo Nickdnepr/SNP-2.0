@@ -10,6 +10,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -20,6 +21,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import test.homework.nick.snp20.R;
 import test.homework.nick.snp20.events_for_eventbus.EventToActivity;
+import test.homework.nick.snp20.events_for_eventbus.EventToService;
 import test.homework.nick.snp20.events_for_eventbus.ListEvent;
 import test.homework.nick.snp20.fragments.BottomSheetTestingFragment;
 import test.homework.nick.snp20.fragments.SearchPlayerFragment;
@@ -49,10 +51,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         EventBus.getDefault().register(this);
+        startPlayerService(false);
         initControlElements();
         setupControlElements();
         BottomSheetTestingFragment fragment = new BottomSheetTestingFragment();
-        SearchPlayerFragment searchPlayerFragment=new SearchPlayerFragment();
+        SearchPlayerFragment searchPlayerFragment = new SearchPlayerFragment();
         changeFragment(searchPlayerFragment);
     }
 
@@ -119,6 +122,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //setting NavigationItemSelectedListener, it selects the pressed item in navigation drawer. here the activity is the listener
         //установка листенера на боковую выдвижную панель(navigation drawer), он выделяет нажатый элемент в списке. листенером выступает активити
         navigationView.setNavigationItemSelectedListener(this);
+
+        pauseAndPlayBottomButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (musicPlaying) {
+                    EventBus.getDefault().post(new EventToService(Commands.STOP_COMMAND));
+                } else {
+                    EventBus.getDefault().post(new EventToService(Commands.START_COMMAND));
+                }
+            }
+        });
+
+        nextBottomButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EventBus.getDefault().post(new EventToService(Commands.NEXT_COMMAND));
+            }
+        });
+
+        previousBottomButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EventBus.getDefault().post(new EventToService(Commands.PREVIOUS_COMMAND));
+            }
+        });
     }
 
 
@@ -128,11 +156,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         getSupportFragmentManager().beginTransaction().replace(R.id.fragmentHost, fragment).commit();
     }
 
-    private void startService(boolean startMusic) {
+    private void startPlayerService(boolean startMusic) {
         Intent intent = new Intent(MainActivity.this, PlayerService.class);
         startService(intent);
-        if (startMusic){
-
+        if (startMusic) {
+            EventBus.getDefault().post(reservePlaylist);
         }
     }
 
@@ -152,31 +180,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (eventToActivity.getMessage().equals(Commands.START_COMMAND)) {
             openSheet();
             musicPlaying = true;
+            pauseAndPlayBottomButton.setImageResource(R.drawable.ic_pause_black_48dp);
         }
 
         if (eventToActivity.getMessage().equals(Commands.STOP_COMMAND)) {
             musicPlaying = false;
-
+            pauseAndPlayBottomButton.setImageResource(R.drawable.ic_play_arrow_black_48dp);
         }
 
         if (eventToActivity.getMessage().equals(Commands.SERVICE_START)) {
-            serviceAlive=true;
+            Log.i("MainActivity", "service is alive and connected");
+            serviceAlive = true;
         }
 
         if (eventToActivity.getMessage().equals(Commands.SERVICE_DESTROY)) {
+            Log.i("MainActivity", "service is dead");
             closeSheet();
             musicPlaying = false;
-            serviceAlive=false;
+            serviceAlive = false;
         }
 
 
     }
 
     @Subscribe
-    public void onEvent(ListEvent listEvent){
-        reservePlaylist=listEvent;
-        if (!serviceAlive){
-            startService(true);
+    public void onEvent(ListEvent listEvent) {
+        reservePlaylist = listEvent;
+        if (!serviceAlive) {
+            startPlayerService(true);
         }
     }
 
