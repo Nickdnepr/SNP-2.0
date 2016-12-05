@@ -18,6 +18,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import test.homework.nick.snp20.R;
 import test.homework.nick.snp20.events_for_eventbus.*;
+import test.homework.nick.snp20.view.fragments.PlaylistsEditFragment;
 import test.homework.nick.snp20.view.fragments.SearchPlayerFragment;
 import test.homework.nick.snp20.utils.Commands;
 
@@ -38,6 +39,9 @@ public class MainActivity extends MActivity implements NavigationView.OnNavigati
     private ImageView nextBottomButton;
     private ImageView previousBottomButton;
 
+    private SearchPlayerFragment searchPlayerFragment;
+    private PlaylistsEditFragment playlistsEditFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,20 +49,19 @@ public class MainActivity extends MActivity implements NavigationView.OnNavigati
         startPlayerService(false);
         initControlElements();
         setupControlElements();
-        SearchPlayerFragment searchPlayerFragment = new SearchPlayerFragment();
         changeFragment(searchPlayerFragment);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        try{
-            if (playerActive){
+        try {
+            if (playerActive) {
                 openSheet();
-            }else {
+            } else {
                 closeSheet();
             }
-        }catch (NullPointerException e){
+        } catch (NullPointerException e) {
             e.printStackTrace();
         }
 
@@ -73,7 +76,7 @@ public class MainActivity extends MActivity implements NavigationView.OnNavigati
         fragmentContent = (FrameLayout) findViewById(R.id.fragmentHost);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbarContext = (TextView) findViewById(R.id.text_in_toolbar);
-        bottomSheetTitle= (TextView) findViewById(R.id.bottom_panel_title);
+        bottomSheetTitle = (TextView) findViewById(R.id.bottom_panel_title);
         navigationView = (NavigationView) findViewById(R.id.navigation_drawer);
         pauseAndPlayBottomButton = (ImageView) findViewById(R.id.bottom_panel_pause_start_button);
         nextBottomButton = (ImageView) findViewById(R.id.bottom_panel_next_button);
@@ -84,6 +87,10 @@ public class MainActivity extends MActivity implements NavigationView.OnNavigati
     //setting clickListeners, attaching elements from upper method to activity, etc.
     //здесь инициализированые в методе выше элементы привязываются к логике, устанавливаются кликлистенеры и тому подобные
     public void setupControlElements() {
+
+
+        searchPlayerFragment = new SearchPlayerFragment();
+        playlistsEditFragment = new PlaylistsEditFragment();
         //attaching toolbar to activity, enabling home button
         //подключение тулбара к активити, включение домашней кнопки на тулбаре
         setSupportActionBar(toolbar);
@@ -157,12 +164,12 @@ public class MainActivity extends MActivity implements NavigationView.OnNavigati
         bottom_panel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent(MainActivity.this, PlayerActivity.class);
+                Intent intent = new Intent(MainActivity.this, PlayerActivity.class);
                 startActivity(intent);
             }
         });
 
-        if (bottomSheetExtended){
+        if (bottomSheetExtended) {
             openSheet();
         }
     }
@@ -173,8 +180,6 @@ public class MainActivity extends MActivity implements NavigationView.OnNavigati
     private void changeFragment(Fragment fragment) {
         getSupportFragmentManager().beginTransaction().replace(R.id.fragmentHost, fragment).commit();
     }
-
-
 
 
     public void openSheet() {
@@ -220,10 +225,10 @@ public class MainActivity extends MActivity implements NavigationView.OnNavigati
     @Override
     public void onEvent(PlayerInfoEvent playerInfoEvent) {
         super.onEvent(playerInfoEvent);
-        if (musicPlaying){
+        if (musicPlaying) {
             openSheet();
             pauseAndPlayBottomButton.setImageResource(R.drawable.ic_pause_black_48dp);
-        }else {
+        } else {
             pauseAndPlayBottomButton.setImageResource(R.drawable.ic_play_arrow_black_48dp);
         }
     }
@@ -231,17 +236,25 @@ public class MainActivity extends MActivity implements NavigationView.OnNavigati
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        if (bottomSheetExtended){
+        if (bottomSheetExtended) {
             openSheet();
         }
     }
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.drawer_search:
+                changeFragment(searchPlayerFragment);
+                break;
+            case R.id.drawer_playlist:
+                changeFragment(playlistsEditFragment);
+                break;
+            case R.id.drawer_equalizer:
+                break;
+        }
         return true;
     }
-
-
 
 
 }

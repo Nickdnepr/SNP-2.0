@@ -14,7 +14,6 @@ import test.homework.nick.snp20.database.MDBHelper;
 import test.homework.nick.snp20.model.playlist_model.Playlist;
 import test.homework.nick.snp20.utils.MGridAdapter;
 import test.homework.nick.snp20.view.ViewModel;
-
 import java.util.ArrayList;
 
 /**
@@ -25,6 +24,8 @@ public class PlaylistsEditFragment extends Fragment implements ViewModel {
     private GridView gridView;
     private TextView searchText;
     private ImageView searchButton;
+
+    private MDBHelper mdbHelper;
 
     @Nullable
     @Override
@@ -48,7 +49,8 @@ public class PlaylistsEditFragment extends Fragment implements ViewModel {
 
     @Override
     public void setupControlElements() {
-        ArrayList<Playlist> list = new MDBHelper(getActivity()).getListOfPlaylists();
+        mdbHelper = new MDBHelper(getActivity().getApplicationContext());
+        ArrayList<Playlist> list = mdbHelper.getListOfPlaylists();
         list.add(0, new Playlist("add new", null));
         MGridAdapter mGridAdapter = new MGridAdapter(getActivity(), list);
         gridView.setAdapter(mGridAdapter);

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 import test.homework.nick.snp20.model.music_info_model.Info;
 import test.homework.nick.snp20.model.music_info_model.User;
 import test.homework.nick.snp20.model.playlist_model.Playlist;
@@ -39,6 +40,10 @@ public class MDBHelper extends SQLiteOpenHelper {
     public MDBHelper(Context context) {
         super(context, "musicDataBase", null, 1);
         database = getWritableDatabase();
+        Log.i("mdatabase", database.toString());
+//        musicTableCursor = database.query(Constants.ALL_MUSIC_TABLE_TITLE, null, null, null, null, null, null);
+//        playlistTableCursor = database.query(Constants.PLAYLIST_TABLE_TITLE, null, null, null, null, null, null);
+        Log.i("mdatabase", "constructor called");
     }
 
     public void addInfo(Info addedInfo, String playlist) {
@@ -95,6 +100,8 @@ public class MDBHelper extends SQLiteOpenHelper {
     }
 
     public ArrayList<Playlist> getListOfPlaylists() {
+        Log.i("mdatabase", "getListOfPlaylists called");
+
         initFields();
         ArrayList<Playlist> playlistList = new ArrayList<>();
         if (playlistTableCursor.moveToFirst()) {
@@ -173,6 +180,8 @@ public class MDBHelper extends SQLiteOpenHelper {
 
 
     private void initFields() {
+        Log.i("mdatabase", "initFields called");
+//        database=getWritableDatabase();
         musicTableCursor = database.query(Constants.ALL_MUSIC_TABLE_TITLE, null, null, null, null, null, null);
 
         musicIdFieldIndex = musicTableCursor.getColumnIndex(Constants.ID_FIELD_TITLE);
@@ -208,7 +217,7 @@ public class MDBHelper extends SQLiteOpenHelper {
         db.execSQL("create table playlistTable (" +
                 "id integer primary key autoincrement," +
                 "title text," +
-                "artwork_path text," +
+                "artwork_path text" +
                 ");");
 
         addPlaylist("All music");
