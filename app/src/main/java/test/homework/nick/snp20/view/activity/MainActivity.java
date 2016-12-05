@@ -1,39 +1,30 @@
-package test.homework.nick.snp20.activity;
+package test.homework.nick.snp20.view.activity;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.widget.*;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import test.homework.nick.snp20.R;
-import test.homework.nick.snp20.events_for_eventbus.EventToActivity;
-import test.homework.nick.snp20.events_for_eventbus.EventToService;
-import test.homework.nick.snp20.events_for_eventbus.ListEvent;
-import test.homework.nick.snp20.fragments.BottomSheetTestingFragment;
-import test.homework.nick.snp20.fragments.SearchPlayerFragment;
-import test.homework.nick.snp20.services.PlayerService;
+import test.homework.nick.snp20.events_for_eventbus.*;
+import test.homework.nick.snp20.view.fragments.SearchPlayerFragment;
 import test.homework.nick.snp20.utils.Commands;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends MActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private boolean bottomSheetExtended = false;
-    private boolean musicPlaying = false;
-    private boolean serviceAlive = false;
-    private ListEvent reservePlaylist;
+
 
     private FrameLayout fragmentContent;
     private LinearLayout bottom_panel;
@@ -41,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private DrawerLayout drawerLayout;
     private Toolbar toolbar;
     private TextView toolbarContext;
+    private TextView bottomSheetTitle;
     private NavigationView navigationView;
     private ImageView pauseAndPlayBottomButton;
     private ImageView nextBottomButton;
@@ -50,24 +42,38 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        EventBus.getDefault().register(this);
         startPlayerService(false);
         initControlElements();
         setupControlElements();
-        BottomSheetTestingFragment fragment = new BottomSheetTestingFragment();
         SearchPlayerFragment searchPlayerFragment = new SearchPlayerFragment();
         changeFragment(searchPlayerFragment);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        try{
+            if (playerActive){
+                openSheet();
+            }else {
+                closeSheet();
+            }
+        }catch (NullPointerException e){
+            e.printStackTrace();
+        }
+
+    }
+
     //initializing all control elements from xml, like layouts, buttons, textViews, toolbar, etc.
     //здесь инициализируются все управляющие элементы типа кнопок, тулбаров и им подобных
-    private void initControlElements() {
+    public void initControlElements() {
         bottom_panel = (LinearLayout) findViewById(R.id.bottom_sheet);
         bottomSheetBehavior = BottomSheetBehavior.from(bottom_panel);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         fragmentContent = (FrameLayout) findViewById(R.id.fragmentHost);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbarContext = (TextView) findViewById(R.id.text_in_toolbar);
+        bottomSheetTitle= (TextView) findViewById(R.id.bottom_panel_title);
         navigationView = (NavigationView) findViewById(R.id.navigation_drawer);
         pauseAndPlayBottomButton = (ImageView) findViewById(R.id.bottom_panel_pause_start_button);
         nextBottomButton = (ImageView) findViewById(R.id.bottom_panel_next_button);
@@ -77,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     //setting clickListeners, attaching elements from upper method to activity, etc.
     //здесь инициализированые в методе выше элементы привязываются к логике, устанавливаются кликлистенеры и тому подобные
-    private void setupControlElements() {
+    public void setupControlElements() {
         //attaching toolbar to activity, enabling home button
         //подключение тулбара к активити, включение домашней кнопки на тулбаре
         setSupportActionBar(toolbar);
@@ -147,6 +153,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 EventBus.getDefault().post(new EventToService(Commands.PREVIOUS_COMMAND));
             }
         });
+
+        bottom_panel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(MainActivity.this, PlayerActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        if (bottomSheetExtended){
+            openSheet();
+        }
     }
 
 
@@ -156,16 +174,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         getSupportFragmentManager().beginTransaction().replace(R.id.fragmentHost, fragment).commit();
     }
 
-    private void startPlayerService(boolean startMusic) {
-        Intent intent = new Intent(MainActivity.this, PlayerService.class);
-        startService(intent);
-        if (startMusic) {
-            EventBus.getDefault().post(reservePlaylist);
-        }
-    }
+
 
 
     public void openSheet() {
+        bottomSheetTitle.setText(reservePlaylist.getPlaylist().get(reservePlaylist.getIndex()).getTitle());
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         bottomSheetExtended = true;
     }
@@ -177,6 +190,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Subscribe
     public void onEvent(EventToActivity eventToActivity) {
+        super.onEvent(eventToActivity);
         if (eventToActivity.getMessage().equals(Commands.START_COMMAND)) {
             openSheet();
             musicPlaying = true;
@@ -203,11 +217,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
-    @Subscribe
-    public void onEvent(ListEvent listEvent) {
-        reservePlaylist = listEvent;
-        if (!serviceAlive) {
-            startPlayerService(true);
+    @Override
+    public void onEvent(PlayerInfoEvent playerInfoEvent) {
+        super.onEvent(playerInfoEvent);
+        if (musicPlaying){
+            openSheet();
+            pauseAndPlayBottomButton.setImageResource(R.drawable.ic_pause_black_48dp);
+        }else {
+            pauseAndPlayBottomButton.setImageResource(R.drawable.ic_play_arrow_black_48dp);
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (bottomSheetExtended){
+            openSheet();
         }
     }
 
@@ -216,9 +241,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        EventBus.getDefault().unregister(this);
-    }
+
+
+
 }

@@ -4,15 +4,15 @@ import android.app.Service;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-import test.homework.nick.snp20.events_for_eventbus.EventToActivity;
-import test.homework.nick.snp20.events_for_eventbus.EventToService;
-import test.homework.nick.snp20.events_for_eventbus.ListEvent;
-import test.homework.nick.snp20.model.Info;
+import test.homework.nick.snp20.events_for_eventbus.*;
+import test.homework.nick.snp20.model.music_info_model.Info;
+import test.homework.nick.snp20.notific.NotificationHelper;
 import test.homework.nick.snp20.utils.Commands;
 import test.homework.nick.snp20.utils.Constants;
 
@@ -24,12 +24,17 @@ import java.util.List;
  */
 
 
-public class PlayerService extends Service implements MediaPlayer.OnPreparedListener {
+public class PlayerService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener {
 
     private MediaPlayer player;
     private List<Info> playlist;
     private int index;
-    public static String TAG = "service";
+    private boolean playerActive = false;
+    private boolean repeat = false;
+    private boolean randomize;
+    private NotificationHelper notificationHelper;
+
+    public static String TAG = "my_service_tag";
 
     @Nullable
     @Override
@@ -40,69 +45,183 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "service started");
-        initPlayer();
-        EventBus.getDefault().register(this);
+
+        try {
+            EventBus.getDefault().register(this);
+            if (notificationHelper==null){
+                notificationHelper = new NotificationHelper(this, false, null);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+
         EventBus.getDefault().post(new EventToActivity(Commands.SERVICE_START));
         return super.onStartCommand(intent, flags, startId);
     }
+
+
 
     private void initPlayer() {
         Log.i(TAG, "started init player");
         if (player != null) {
             player.pause();
+            sendStatus();
+            try {
+                startPositionSending();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             Log.i(TAG, "player pause");
         }
         player = new MediaPlayer();
         player.setAudioStreamType(AudioManager.STREAM_MUSIC);
     }
 
-    private void startPlayerWithPath(String path) throws IOException {
+    private void startPlayerWithPath(String path) {
         Log.i(TAG, "startPlayerCalled");
-        player.setDataSource(path);
+        initPlayer();
+        try {
+            player.setDataSource(path + "?client_id=" + Constants.USER_ID);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         player.setOnPreparedListener(this);
-        player.prepare();
+        player.prepareAsync();
     }
 
     @Subscribe
-    public void onEvent(ListEvent event) throws IOException {
+    public void onEvent(ListEvent listEvent) {
         Log.i(TAG, "listEvent  received");
         initPlayer();
-        playlist = event.getPlaylist();
-        index = event.getIndex();
+        playlist = listEvent.getPlaylist();
+        index = listEvent.getIndex();
         Info info = playlist.get(index);
 
-        //TODO
-        startPlayerWithPath(info.getStream_url()+"?client_id="+ Constants.USER_ID);
-        Log.i("player debug", info.getStream_url()+"?client_id="+ Constants.USER_ID);
+        //TODO playing from sdcard
+        startPlayerWithPath(info.getStream_url());
+        Log.i("player debug", info.getStream_url() + "?client_id=" + Constants.USER_ID);
+    }
+
+    @Subscribe
+    public void onEvent(PositionEventToService positionEventToService) {
+        player.seekTo(positionEventToService.getPosition());
     }
 
     @Subscribe
     public void onEvent(EventToService eventToService) {
+
+        Log.i("notification service", eventToService.getMessage());
         Log.i(TAG, "eventToService  received");
+        Log.i(TAG, eventToService.getMessage());
         if (eventToService.getMessage().equals(Commands.START_COMMAND)) {
             player.start();
-            EventBus.getDefault().post(new EventToActivity(Commands.START_COMMAND));
+            sendStatus();
         }
 
         if (eventToService.getMessage().equals(Commands.STOP_COMMAND)) {
             player.pause();
-            EventBus.getDefault().post(new EventToActivity(Commands.STOP_COMMAND));
+            sendStatus();
         }
 
+        if (eventToService.getMessage().equals(Commands.NEXT_COMMAND)) {
+            nextSong();
+        }
+
+        if (eventToService.getMessage().equals(Commands.PREVIOUS_COMMAND)) {
+            previousSong();
+        }
+
+        if (eventToService.getMessage().equals(Commands.REPEAT_COMMAND)) {
+            repeat = !repeat;
+        }
+
+        sendStatus();
     }
 
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        EventBus.getDefault().unregister(this);
-        EventBus.getDefault().post(Commands.SERVICE_DESTROY);
+    private void nextSong() {
+        Log.i(TAG, "next command");
+        if (index + 1 == playlist.size()) {
+            index = 0;
+        } else {
+            index++;
+        }
+        startPlayerWithPath(playlist.get(index).getStream_url());
+    }
+
+
+    private void previousSong() {
+        Log.i(TAG, "previous command");
+        if (index - 1 == 0) {
+            index = playlist.size() - 1;
+        } else {
+            index--;
+        }
+        startPlayerWithPath(playlist.get(index).getStream_url());
     }
 
 
     @Override
     public void onPrepared(MediaPlayer mp) {
+        EventBus.getDefault().post(new EventToActivity(Commands.PLAYER_ACTIVE));
         mp.start();
-        EventBus.getDefault().post(new EventToActivity(Commands.START_COMMAND));
+        sendStatus();
+        player.setOnCompletionListener(this);
+
+    }
+
+    private void startPositionSending() {
+        new AsyncTask() {
+            @Override
+            protected Object doInBackground(Object[] params) {
+
+                while (true) {
+                    try {
+                        Thread.sleep(500);
+                        publishProgress();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+
+
+            @Override
+            protected void onProgressUpdate(Object[] values) {
+                super.onProgressUpdate(values);
+                EventBus.getDefault().post(new PositionEventToActivity(player.getCurrentPosition(), player.getDuration()));
+                notificationHelper.setCurrentInfo(new PlayerInfoEvent(repeat, randomize, player.getCurrentPosition(), player.getDuration(), new ListEvent(playlist, index), player.isPlaying()));
+
+                sendStatus();
+            }
+        }.execute();
+    }
+
+    private void sendStatus() {
+        EventBus.getDefault().post(new PlayerInfoEvent(repeat, randomize, player.getCurrentPosition(), player.getDuration(), new ListEvent(playlist, index), player.isPlaying()));
+    }
+
+    @Override
+    public void onCompletion(MediaPlayer mp) {
+        Log.i(TAG, "music completed");
+        if (!repeat) {
+            nextSong();
+        } else {
+            startPlayerWithPath(playlist.get(index).getStream_url());
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+        EventBus.getDefault().post(new EventToActivity(Commands.SERVICE_DESTROY));
+        notificationHelper.hideNotification();
+        if (playerActive) {
+            EventBus.getDefault().post(new EventToActivity(Commands.PLAYER_DEACTIVE));
+        }
     }
 }

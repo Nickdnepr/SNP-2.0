@@ -8,9 +8,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import org.greenrobot.eventbus.EventBus;
 import test.homework.nick.snp20.R;
-import test.homework.nick.snp20.events_for_eventbus.EventToActivity;
 import test.homework.nick.snp20.events_for_eventbus.ListEvent;
-import test.homework.nick.snp20.model.Info;
+import test.homework.nick.snp20.model.music_info_model.Info;
 
 import java.util.List;
 
@@ -67,7 +66,7 @@ public class MRecyclerAdapter extends RecyclerView.Adapter<MRecyclerAdapter.MVie
         @Override
         public void onClick(View v) {
             Log.i(TAG, "clicked, id="+getAdapterPosition());
-            EventBus.getDefault().post(new ListEvent(playlist, getAdapterPosition(), true));
+            EventBus.getDefault().post(new ListEvent(playlist, getAdapterPosition()));
         }
     }
 }

@@ -1,4 +1,4 @@
-package test.homework.nick.snp20.model;
+package test.homework.nick.snp20.model.music_info_model;
 
 import java.io.Serializable;
 

@@ -5,4 +5,13 @@ package test.homework.nick.snp20.events_for_eventbus;
  */
 public class PositionEventToService {
 
+    private int position;
+
+    public PositionEventToService(int position) {
+        this.position = position;
+    }
+
+    public int getPosition() {
+        return position;
+    }
 }

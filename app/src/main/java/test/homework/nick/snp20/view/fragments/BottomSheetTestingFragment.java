@@ -1,4 +1,4 @@
-package test.homework.nick.snp20.fragments;
+package test.homework.nick.snp20.view.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -8,12 +8,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import test.homework.nick.snp20.R;
-import test.homework.nick.snp20.activity.MainActivity;
+import test.homework.nick.snp20.view.ViewModel;
+import test.homework.nick.snp20.view.activity.MainActivity;
 
 /**
  * Created by Nick on 27.10.16.
  */
-public class BottomSheetTestingFragment extends Fragment{
+public class BottomSheetTestingFragment extends Fragment implements ViewModel{
 
     MainActivity activity;
     Button openButton;
@@ -46,5 +47,15 @@ public class BottomSheetTestingFragment extends Fragment{
                 activity.closeSheet();
             }
         });
+    }
+
+    @Override
+    public void initControlElements() {
+
+    }
+
+    @Override
+    public void setupControlElements() {
+
     }
 }

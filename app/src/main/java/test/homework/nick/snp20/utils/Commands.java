@@ -11,6 +11,10 @@ public class Commands {
     public static String STOP_COMMAND = "stop player";
     public static String NEXT_COMMAND = "next music";
     public static String PREVIOUS_COMMAND = "previous music";
+    public static String REPEAT_COMMAND = "repeat this music";
+    public static String PLAYER_ACTIVE = "player active";
+    public static String PLAYER_DEACTIVE = "player not active";
+    public static String RANDOMIZE_COMMAND="make random playlist";
     public static String NEED_SERVICE_START = "start service now";
 
 

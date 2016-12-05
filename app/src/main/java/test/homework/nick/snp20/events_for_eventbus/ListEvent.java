@@ -1,6 +1,6 @@
 package test.homework.nick.snp20.events_for_eventbus;
 
-import test.homework.nick.snp20.model.Info;
+import test.homework.nick.snp20.model.music_info_model.Info;
 
 import java.util.List;
 
@@ -11,12 +11,12 @@ public class ListEvent {
 
     private List<Info> playlist;
     private int index;
-    private boolean startWhenReceive;
 
-    public ListEvent(List<Info> playlist, int index, boolean startWhenReceive) {
+
+    public ListEvent(List<Info> playlist, int index) {
         this.playlist = playlist;
         this.index = index;
-        this.startWhenReceive = startWhenReceive;
+
     }
 
 
@@ -28,7 +28,5 @@ public class ListEvent {
         return index;
     }
 
-    public boolean isStartWhenReceive() {
-        return startWhenReceive;
-    }
+
 }
