@@ -38,7 +38,7 @@ public class MDBHelper extends SQLiteOpenHelper {
     private int playlistArtworkPath;
 
     public MDBHelper(Context context) {
-        super(context, "musicDataBase", null, 1);
+        super(context, "snpMusicDataBase", null, 1);
         database = getWritableDatabase();
         Log.i("mdatabase", database.toString());
 //        musicTableCursor = database.query(Constants.ALL_MUSIC_TABLE_TITLE, null, null, null, null, null, null);
