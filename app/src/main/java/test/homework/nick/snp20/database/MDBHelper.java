@@ -209,7 +209,7 @@ public class MDBHelper extends SQLiteOpenHelper {
                 "author_name text," +
                 "stream_url text," +
                 "artwork_url text," +
-                "duration int," +
+                "duration integer," +
                 "path_to_file text," +
                 "playlist text" +
                 ");");
@@ -222,6 +222,8 @@ public class MDBHelper extends SQLiteOpenHelper {
 
         addPlaylist("All music");
         addPlaylist("Downloads");
+        Log.i("mdatabase", "onCreate called");
+
     }
 
     @Override

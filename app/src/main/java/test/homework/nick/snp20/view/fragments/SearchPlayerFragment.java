@@ -90,6 +90,7 @@ public class SearchPlayerFragment extends Fragment implements ViewModel{
     //http://api.soundcloud.com/tracks.json?q=h&limit=100&client_id=8a81c591a1701b27d7e76e7b4e780050
     private void makeSpringRequest(String request) {
         new HttpTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, StringGenerator.generateRequestHttpString(request));
+        Log.i("spring request", request);
     }
 
     private class HttpTask extends AsyncTask<String, Void, Void> {
@@ -104,24 +105,29 @@ public class SearchPlayerFragment extends Fragment implements ViewModel{
 
         @Override
         protected Void doInBackground(String... params) {
+            try{
+                Log.i("spring", "inside async");
+                String url = params[0];
+                RestTemplate restTemplate = new RestTemplate();
+                restTemplate.getMessageConverters().add(new StringHttpMessageConverter());
+                Log.i("spring", url);
 
-            Log.i("spring", "inside async");
-            String url = params[0];
-            RestTemplate restTemplate = new RestTemplate();
-            restTemplate.getMessageConverters().add(new StringHttpMessageConverter());
-            Log.i("spring", url);
+                String result = restTemplate.getForObject(url, String.class);
+                Log.i("spring", result);
+                Log.i("spring", String.valueOf(result.length()));
 
-            String result = restTemplate.getForObject(url, String.class);
-            Log.i("spring", result);
-            Log.i("spring", String.valueOf(result.length()));
+                Type listType = new TypeToken<ArrayList<Info>>() {
+                }.getType();
+                playlist.clear();
+                List<Info> list = gson.fromJson(result, listType);
+                playlist.addAll(list);
 
-            Type listType = new TypeToken<ArrayList<Info>>() {
-            }.getType();
-            playlist.clear();
-            List<Info> list = gson.fromJson(result, listType);
-            playlist.addAll(list);
+                Log.i("spring list", list.toString());
+            }catch (Exception e){
+                e.printStackTrace();
+            }
 
-            Log.i("spring list", list.toString());
+
             return null;
         }
 
