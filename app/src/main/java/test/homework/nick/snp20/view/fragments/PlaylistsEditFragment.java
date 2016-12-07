@@ -11,10 +11,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import test.homework.nick.snp20.R;
 import test.homework.nick.snp20.database.MDBHelper;
+import test.homework.nick.snp20.database.service.PlaylistService;
 import test.homework.nick.snp20.model.playlist_model.Playlist;
 import test.homework.nick.snp20.utils.MGridAdapter;
 import test.homework.nick.snp20.view.ViewModel;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Nick on 05.12.16.
@@ -49,12 +51,20 @@ public class PlaylistsEditFragment extends Fragment implements ViewModel {
 
     @Override
     public void setupControlElements() {
-        mdbHelper = new MDBHelper(getActivity().getApplicationContext());
-        ArrayList<Playlist> list = mdbHelper.getListOfPlaylists();
+        List<Playlist> list = new PlaylistService(getContext()).getAll();
         list.add(0, new Playlist("add new", null));
         MGridAdapter mGridAdapter = new MGridAdapter(getActivity(), list);
         gridView.setAdapter(mGridAdapter);
         mGridAdapter.notifyDataSetChanged();
+        setupGridView();
+    }
+
+    private void setupGridView(){
+        gridView.setNumColumns(3);
+//        gridView.setColumnWidth(800);
+        gridView.setHorizontalSpacing(5);
+        gridView.setVerticalSpacing(5);
+//        gridView.setStretchMode(GridView.STRETCH_SPACING_UNIFORM);
     }
 
 }

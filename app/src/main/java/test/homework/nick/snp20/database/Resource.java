@@ -19,7 +19,7 @@ public class Resource {
         public static final String AUTHOR_NAME = "author_name";
         public static final String PLAYLIST = "playlist";
 
-        public static final String CREATE_TABLE = "create table" + TABLE_NAME +
+        public static final String CREATE_TABLE = "create table " + TABLE_NAME +
                 " ( " + ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 TITLE + " TEXT, " +
                 STREAM_URL + " TEXT, " +
@@ -40,7 +40,7 @@ public class Resource {
         public static final String DOWNLOADED_MUSIC_PLAYLIST_TITLE = "Downloaded music";
 
 
-        public static final String CREATE_TABLE = "create table" + TABLE_NAME +
+        public static final String CREATE_TABLE = "create table " + TABLE_NAME +
                 " ( " + ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 TITLE + " TEXT, " +
                 ARTWORK_URL + " TEXT);";

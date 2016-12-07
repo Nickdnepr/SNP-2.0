@@ -2,6 +2,7 @@ package test.homework.nick.snp20.utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by Nick on 03.09.16.
@@ -38,5 +39,17 @@ public class StringGenerator {
     public static ArrayList<String> generateListOfPlaylists(String lists){
         String[] arr = lists.split("===");
         return new ArrayList<>(Arrays.asList(arr));
+    }
+
+    public static String generatePlaylistStringFromList(List<String> list){
+        StringBuilder s = new StringBuilder();
+        for (int i=0; i<list.size(); i++){
+            s.append(list.get(i));
+            if (list.size()-i!=1){
+                s.append("===");
+            }
+        }
+
+        return s.toString();
     }
 }

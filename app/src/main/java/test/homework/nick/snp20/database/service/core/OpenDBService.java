@@ -1,6 +1,7 @@
 package test.homework.nick.snp20.database.service.core;
 
 import android.app.Activity;
+import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import test.homework.nick.snp20.database.MDBHelper;
 
@@ -23,9 +24,9 @@ public class OpenDBService {
         return helper != null && database != null && database.isOpen();
     }
 
-    protected void open(Activity activity) {
+    protected void open(Context context) {
         if (database == null || !database.isOpen()) {
-            helper = new MDBHelper(activity);
+            helper = new MDBHelper(context);
             database = helper.getWritableDatabase();
         }
     }

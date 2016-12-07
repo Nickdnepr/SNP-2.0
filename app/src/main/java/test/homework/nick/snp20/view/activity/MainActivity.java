@@ -11,6 +11,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
@@ -253,6 +254,7 @@ public class MainActivity extends MActivity implements NavigationView.OnNavigati
             case R.id.drawer_equalizer:
                 break;
         }
+        drawerLayout.closeDrawer(Gravity.LEFT);
         return true;
     }
 

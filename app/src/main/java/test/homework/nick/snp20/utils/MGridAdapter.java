@@ -11,16 +11,17 @@ import test.homework.nick.snp20.R;
 import test.homework.nick.snp20.model.playlist_model.Playlist;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Nick on 04.12.16.
  */
 public class MGridAdapter extends BaseAdapter {
 
-    private ArrayList<Playlist> listOfPlaylists;
+    private List<Playlist> listOfPlaylists;
     private LayoutInflater inflater;
 
-    public MGridAdapter(Context context, ArrayList<Playlist> listOfPlaylists) {
+    public MGridAdapter(Context context, List<Playlist> listOfPlaylists) {
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.listOfPlaylists = listOfPlaylists;
     }
