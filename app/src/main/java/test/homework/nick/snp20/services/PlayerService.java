@@ -33,6 +33,7 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
     private boolean playerActive = false;
     private boolean repeat = false;
     private boolean randomize;
+    private boolean positionSending;
     private NotificationHelper notificationHelper;
 
     public static String TAG = "my_service_tag";
@@ -188,30 +189,55 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
     }
 
     private void startPositionSending() {
-        new AsyncTask() {
-            @Override
-            protected Object doInBackground(Object[] params) {
-            Log.i(TAG, "sss");
-                while (true) {
-                    try {
-                        Thread.sleep(500);
-                        publishProgress();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+        if (!positionSending){
+            new AsyncTask() {
+
+                @Override
+                protected void onPreExecute() {
+                    super.onPreExecute();
+                    positionSending=true;
                 }
 
-            }
+                @Override
+                protected Object doInBackground(Object[] params) {
+                    Log.i(TAG, "sss");
+                    while (true) {
+                        try {
+                            Thread.sleep(500);
+                            publishProgress();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                }
 
 
-            @Override
-            protected void onProgressUpdate(Object[] values) {
-                super.onProgressUpdate(values);
-                EventBus.getDefault().post(new PositionEventToActivity(player.getCurrentPosition(), player.getDuration()));
-                notificationHelper.setCurrentInfo(new PlayerInfoEvent(repeat, randomize, player.getCurrentPosition(), player.getDuration(), new ListEvent(playlist, index), player.isPlaying()));
-                sendStatus();
-            }
-        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                @Override
+                protected void onProgressUpdate(Object[] values) {
+                    super.onProgressUpdate(values);
+                    EventBus.getDefault().post(new PositionEventToActivity(player.getCurrentPosition(), player.getDuration()));
+                    notificationHelper.setCurrentInfo(new PlayerInfoEvent(repeat, randomize, player.getCurrentPosition(), player.getDuration(), new ListEvent(playlist, index), player.isPlaying()));
+                    sendStatus();
+                }
+
+                @Override
+                protected void onCancelled() {
+                    super.onCancelled();
+                    positionSending=false;
+                }
+
+                @Override
+                protected void onPostExecute(Object o) {
+                    super.onPostExecute(o);
+                    positionSending=false;
+                }
+
+
+            }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }
+
+
     }
 
     private void sendStatus() {
