@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.nfc.Tag;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -48,7 +49,7 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
 
         try {
             EventBus.getDefault().register(this);
-            if (notificationHelper==null){
+            if (notificationHelper == null) {
                 notificationHelper = new NotificationHelper(this, false, null);
             }
         } catch (Exception e) {
@@ -56,52 +57,57 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
         }
 
 
-
         EventBus.getDefault().post(new EventToActivity(Commands.SERVICE_START));
         return super.onStartCommand(intent, flags, startId);
     }
 
 
-
     private void initPlayer() {
         Log.i(TAG, "started init player");
         if (player != null) {
-            player.pause();
-            sendStatus();
-            try {
-                startPositionSending();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            player.release();
+
             Log.i(TAG, "player pause");
         }
+
         player = new MediaPlayer();
         player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        player.setOnPreparedListener(this);
+        try {
+            startPositionSending();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void startPlayerWithPath(String path) {
         Log.i(TAG, "startPlayerCalled");
         initPlayer();
+
         try {
             player.setDataSource(path + "?client_id=" + Constants.USER_ID);
         } catch (IOException e) {
+            Log.i(TAG, "player io error on setdata");
             e.printStackTrace();
         }
-        player.setOnPreparedListener(this);
+
+
         player.prepareAsync();
+        sendStatus();
     }
 
     @Subscribe
     public void onEvent(ListEvent listEvent) {
         Log.i(TAG, "listEvent  received");
-        initPlayer();
+//        initPlayer();
         playlist = listEvent.getPlaylist();
         index = listEvent.getIndex();
         Info info = playlist.get(index);
 
         //TODO playing from sdcard
+        Log.i(TAG, info.getStream_url() + "?client_id=" + Constants.USER_ID);
         startPlayerWithPath(info.getStream_url());
-        Log.i("player debug", info.getStream_url() + "?client_id=" + Constants.USER_ID);
+
     }
 
     @Subscribe
@@ -135,6 +141,15 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
 
         if (eventToService.getMessage().equals(Commands.REPEAT_COMMAND)) {
             repeat = !repeat;
+        }
+
+        if (eventToService.getMessage().equals(Commands.NOTIFICATION_START_STOP_COMMAND)){
+            Log.i(TAG, "start stop recieved");
+            if (player.isPlaying()){
+                player.pause();
+            }else {
+                player.start();
+            }
         }
 
         sendStatus();
@@ -176,7 +191,7 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
         new AsyncTask() {
             @Override
             protected Object doInBackground(Object[] params) {
-
+            Log.i(TAG, "sss");
                 while (true) {
                     try {
                         Thread.sleep(500);
@@ -194,10 +209,9 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
                 super.onProgressUpdate(values);
                 EventBus.getDefault().post(new PositionEventToActivity(player.getCurrentPosition(), player.getDuration()));
                 notificationHelper.setCurrentInfo(new PlayerInfoEvent(repeat, randomize, player.getCurrentPosition(), player.getDuration(), new ListEvent(playlist, index), player.isPlaying()));
-
                 sendStatus();
             }
-        }.execute();
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     private void sendStatus() {

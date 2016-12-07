@@ -24,7 +24,6 @@ public class NotificationHelper {
     private NotificationCompat.Builder builder;
     private RemoteViews remoteViews;
     private final int notificationId = (int) System.currentTimeMillis();
-    private boolean notifInited = false;
 
     public NotificationHelper(Context context, boolean playing, PlayerInfoEvent currentInfo) {
         this.context = context;
@@ -39,19 +38,19 @@ public class NotificationHelper {
         remoteViews = new RemoteViews(context.getPackageName(), R.layout.notification_layout);
         if (!playing) {
             remoteViews.setImageViewResource(R.id.notification_pause_button, R.drawable.ic_play_arrow_black_48dp);
-        }else {
+        } else {
             remoteViews.setImageViewResource(R.id.notification_pause_button, R.drawable.ic_pause_black_48dp);
         }
 
-//        if (!notifInited) {
-            setListeners();
-//        }
+        setListeners();
+
 
         manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         builder = new NotificationCompat.Builder(context);
         builder.setSmallIcon(R.drawable.ic_pause_black_48dp);
         builder.setAutoCancel(false);
         builder.setContent(remoteViews);
+        builder.setOngoing(true);
 
         manager.notify(notificationId, builder.build());
     }
@@ -68,17 +67,12 @@ public class NotificationHelper {
         remoteViews.setOnClickPendingIntent(R.id.notification_next_button, nextClickIntent);
 
         Intent pauseButtonIntent;
-        if (playing) {
-            pauseButtonIntent = new Intent(context.getString(R.string.notification_broadcast_title));
-            pauseButtonIntent.putExtra(Constants.BROADCAST_INTENT_COMMAND_EXTRA_TITLE, Commands.STOP_COMMAND);
-        } else {
-            pauseButtonIntent = new Intent(context.getString(R.string.notification_broadcast_title));
-            pauseButtonIntent.putExtra(Constants.BROADCAST_INTENT_COMMAND_EXTRA_TITLE, Commands.START_COMMAND);
-        }
+
+        pauseButtonIntent = new Intent(context.getString(R.string.notification_broadcast_title));
+        pauseButtonIntent.putExtra(Constants.BROADCAST_INTENT_COMMAND_EXTRA_TITLE, Commands.NOTIFICATION_START_STOP_COMMAND);
         PendingIntent pauseClickIntent = PendingIntent.getBroadcast(context, 2, pauseButtonIntent, 0);
         remoteViews.setOnClickPendingIntent(R.id.notification_pause_button, pauseClickIntent);
 
-//        notifInited = true;
     }
 
     public void hideNotification() {
@@ -86,10 +80,8 @@ public class NotificationHelper {
     }
 
     public void setCurrentInfo(PlayerInfoEvent currentInfo) {
-        //TODO fix play button bug
         this.currentInfo = currentInfo;
         playing = currentInfo.isPlaying();
-        Log.i("notification 111", "playing is" + playing);
         showNotification();
     }
 }

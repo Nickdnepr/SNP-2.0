@@ -33,14 +33,9 @@ public class ButtonListener extends BroadcastReceiver{
             Log.i("notification", "next sended");
         }
 
-        if (intent.getStringExtra(Constants.BROADCAST_INTENT_COMMAND_EXTRA_TITLE).equals(Commands.STOP_COMMAND)){
-            EventBus.getDefault().post(new EventToService(Commands.STOP_COMMAND));
-            Log.i("notification", "stop sended");
-        }
-
-        if (intent.getStringExtra(Constants.BROADCAST_INTENT_COMMAND_EXTRA_TITLE).equals(Commands.START_COMMAND)){
-            EventBus.getDefault().post(new EventToService(Commands.START_COMMAND));
-            Log.i("notification", "start sended");
+        if (intent.getStringExtra(Constants.BROADCAST_INTENT_COMMAND_EXTRA_TITLE).equals(Commands.NOTIFICATION_START_STOP_COMMAND)){
+            EventBus.getDefault().post(new EventToService(Commands.NOTIFICATION_START_STOP_COMMAND));
+            Log.i("notification", "start stop sended");
         }
 
     }
