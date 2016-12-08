@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import org.greenrobot.eventbus.EventBus;
 import test.homework.nick.snp20.R;
-import test.homework.nick.snp20.events_for_eventbus.ListEvent;
+import test.homework.nick.snp20.events_for_eventbus.view_to_player_events.ListEvent;
 import test.homework.nick.snp20.model.music_info_model.Info;
 
 import java.util.List;

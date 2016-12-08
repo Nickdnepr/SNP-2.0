@@ -1,4 +1,4 @@
-package test.homework.nick.snp20.events_for_eventbus;
+package test.homework.nick.snp20.events_for_eventbus.view_to_player_events;
 
 import test.homework.nick.snp20.model.music_info_model.Info;
 

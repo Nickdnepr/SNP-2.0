@@ -5,10 +5,9 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 import android.widget.RemoteViews;
 import test.homework.nick.snp20.R;
-import test.homework.nick.snp20.events_for_eventbus.PlayerInfoEvent;
+import test.homework.nick.snp20.events_for_eventbus.view_to_player_events.PlayerInfoEvent;
 import test.homework.nick.snp20.utils.Commands;
 import test.homework.nick.snp20.utils.Constants;
 

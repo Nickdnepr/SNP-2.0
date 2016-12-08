@@ -10,7 +10,7 @@ import android.widget.TextView;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import test.homework.nick.snp20.R;
-import test.homework.nick.snp20.events_for_eventbus.*;
+import test.homework.nick.snp20.events_for_eventbus.view_to_player_events.*;
 import test.homework.nick.snp20.model.music_info_model.Info;
 import test.homework.nick.snp20.utils.Commands;
 import test.homework.nick.snp20.utils.ProgressToMillsConverter;

@@ -6,7 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import org.greenrobot.eventbus.EventBus;
-import test.homework.nick.snp20.events_for_eventbus.EventToService;
+import test.homework.nick.snp20.events_for_eventbus.view_to_player_events.EventToService;
 import test.homework.nick.snp20.utils.Commands;
 import test.homework.nick.snp20.utils.Constants;
 

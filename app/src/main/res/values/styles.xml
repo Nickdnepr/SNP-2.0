@@ -12,6 +12,11 @@
     <style name="MyToolbarTheme" parent="Widget.AppCompat.Toolbar">
         <item name="android:textColorSecondary">@color/white</item>
     </style>
+    
+    <style name="MDialog">
+        <item name="android:topDark">@color/colorPrimary</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
 
 
 </resources>

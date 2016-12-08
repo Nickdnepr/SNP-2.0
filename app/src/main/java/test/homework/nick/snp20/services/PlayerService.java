@@ -4,14 +4,13 @@ import android.app.Service;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.nfc.Tag;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-import test.homework.nick.snp20.events_for_eventbus.*;
+import test.homework.nick.snp20.events_for_eventbus.view_to_player_events.*;
 import test.homework.nick.snp20.model.music_info_model.Info;
 import test.homework.nick.snp20.notific.NotificationHelper;
 import test.homework.nick.snp20.utils.Commands;
@@ -170,7 +169,7 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
 
     private void previousSong() {
         Log.i(TAG, "previous command");
-        if (index - 1 == 0) {
+        if (index - 1 < 0) {
             index = playlist.size() - 1;
         } else {
             index--;
@@ -263,5 +262,7 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
         if (playerActive) {
             EventBus.getDefault().post(new EventToActivity(Commands.PLAYER_DEACTIVE));
         }
+
+        notificationHelper.hideNotification();
     }
 }
