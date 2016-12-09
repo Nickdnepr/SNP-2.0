@@ -4,17 +4,23 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import test.homework.nick.snp20.R;
+import test.homework.nick.snp20.database.Resource;
+import test.homework.nick.snp20.database.service.InfoService;
+import test.homework.nick.snp20.events_for_eventbus.dialog_events.AddInfoToPlaylistDialogEvent;
 import test.homework.nick.snp20.events_for_eventbus.view_to_player_events.*;
 import test.homework.nick.snp20.model.music_info_model.Info;
-import test.homework.nick.snp20.utils.Commands;
-import test.homework.nick.snp20.utils.ProgressToMillsConverter;
-import test.homework.nick.snp20.utils.StringGenerator;
+import test.homework.nick.snp20.model.playlist_model.Playlist;
+import test.homework.nick.snp20.utils.string_containers.Commands;
+import test.homework.nick.snp20.utils.converters.ProgressToMillsConverter;
+import test.homework.nick.snp20.utils.converters.StringGenerator;
+import test.homework.nick.snp20.view.fragments.dialog_fragments.AddInfoToPlaylistDialog;
 
 /**
  * Created by Nick on 13.11.16.
@@ -33,6 +39,8 @@ public class PlayerActivity extends MActivity {
     private TextView currentPosition;
     private TextView duration;
     private ImageView backButton;
+    private ImageView showPlaylistButton;
+    private ImageView addInfoButton;
     private ImageView randomPlaylistButton;
     private ImageView previousButton;
     private ImageView startStopButton;
@@ -71,6 +79,8 @@ public class PlayerActivity extends MActivity {
         currentPosition = (TextView) findViewById(R.id.player_current_position);
         duration = (TextView) findViewById(R.id.player_duration);
         backButton = (ImageView) findViewById(R.id.player_back_button);
+        showPlaylistButton = (ImageView) findViewById(R.id.show_playlist_button);
+        addInfoButton = (ImageView) findViewById(R.id.add_info_button);
         randomPlaylistButton = (ImageView) findViewById(R.id.player_random_playlist_button);
         previousButton = (ImageView) findViewById(R.id.player_previous_button);
         startStopButton = (ImageView) findViewById(R.id.player_play_stop_button);
@@ -139,6 +149,28 @@ public class PlayerActivity extends MActivity {
             repeatButton.setBackgroundColor(getResources().getColor(R.color.white));
         }
 
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+
+        showPlaylistButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+
+        addInfoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AddInfoToPlaylistDialog dialog = new AddInfoToPlaylistDialog();
+                dialog.show(getSupportFragmentManager(), "add_info_dialog");
+            }
+        });
     }
 
     @Subscribe
@@ -150,6 +182,19 @@ public class PlayerActivity extends MActivity {
         Log.i("position event", String.valueOf(positionMills));
         Log.i("position event", String.valueOf(durationMills));
         progressSeekBar.setProgress(ProgressToMillsConverter.millsToProgress(durationMills, positionMills));
+    }
+
+    @Subscribe
+    public void onEvent(AddInfoToPlaylistDialogEvent addInfoToPlaylistDialogEvent){
+        //checking current info for existing in the chosen playlist
+        if (!new InfoService(this).getPlaylist(addInfoToPlaylistDialogEvent.getPlaylist()).contains(reservePlaylist.getPlaylist().get(reservePlaylist.getIndex()))){
+            //checking current info for existing in database
+            if (!new InfoService(this).getPlaylist(new Playlist(Resource.Playlist.ALL_MUSIC_PLAYLIST_TITLE, null)).contains(reservePlaylist.getPlaylist().get(reservePlaylist.getIndex()))){
+                new InfoService(this).save(reservePlaylist.getPlaylist().get(reservePlaylist.getIndex()));
+            }
+            new InfoService(this).addInfoToPlaylist(reservePlaylist.getPlaylist().get(reservePlaylist.getIndex()), addInfoToPlaylistDialogEvent.getPlaylist());
+
+        }
     }
 
     @Override

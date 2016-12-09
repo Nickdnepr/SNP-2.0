@@ -13,7 +13,7 @@ import test.homework.nick.snp20.events_for_eventbus.view_to_player_events.EventT
 import test.homework.nick.snp20.events_for_eventbus.view_to_player_events.ListEvent;
 import test.homework.nick.snp20.events_for_eventbus.view_to_player_events.PlayerInfoEvent;
 import test.homework.nick.snp20.services.PlayerService;
-import test.homework.nick.snp20.utils.Commands;
+import test.homework.nick.snp20.utils.string_containers.Commands;
 import test.homework.nick.snp20.view.ViewModel;
 
 /**

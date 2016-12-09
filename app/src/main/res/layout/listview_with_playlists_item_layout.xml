@@ -5,7 +5,9 @@
               android:layout_height="60dp">
     <TextView
             android:layout_width="match_parent"
-            android:layout_height=""
-            android:layout_gravity="center"
+            android:layout_height="60dp"
+            android:layout_gravity="center_vertical"
+            android:textSize="18sp"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
             android:id="@+id/playlist_title"/>
 </LinearLayout>

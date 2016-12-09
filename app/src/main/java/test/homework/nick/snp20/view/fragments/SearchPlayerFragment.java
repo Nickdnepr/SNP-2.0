@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -25,8 +26,8 @@ import test.homework.nick.snp20.R;
 import test.homework.nick.snp20.view.ViewModel;
 import test.homework.nick.snp20.view.activity.MainActivity;
 import test.homework.nick.snp20.model.music_info_model.Info;
-import test.homework.nick.snp20.utils.MRecyclerAdapter;
-import test.homework.nick.snp20.utils.StringGenerator;
+import test.homework.nick.snp20.utils.adapters.MRecyclerAdapter;
+import test.homework.nick.snp20.utils.converters.StringGenerator;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -71,6 +72,8 @@ public class SearchPlayerFragment extends Fragment implements ViewModel{
     }
 
     public void setupControlElements() {
+        RecyclerView.ItemAnimator itemAnimator = new DefaultItemAnimator();
+        recyclerView.setItemAnimator(itemAnimator);
         adapter = new MRecyclerAdapter(playlist);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));

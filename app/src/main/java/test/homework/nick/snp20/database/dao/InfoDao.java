@@ -3,12 +3,13 @@ package test.homework.nick.snp20.database.dao;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 import test.homework.nick.snp20.database.Resource;
 import test.homework.nick.snp20.database.dao.core.Dao;
 import test.homework.nick.snp20.model.music_info_model.Info;
 import test.homework.nick.snp20.model.music_info_model.User;
 import test.homework.nick.snp20.model.playlist_model.Playlist;
-import test.homework.nick.snp20.utils.StringGenerator;
+import test.homework.nick.snp20.utils.converters.StringGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,7 @@ public class InfoDao implements Dao<Info> {
 
     @Override
     public long save(Info info) {
+        Log.i("database info saved", info.getTitle());
         return database.insert(Resource.Info.TABLE_NAME, null, parseInfo(info));
     }
 
@@ -57,8 +59,19 @@ public class InfoDao implements Dao<Info> {
     public long addInfoToPlaylist(Info info, Playlist playlist) {
         ContentValues contentValues = new ContentValues();
         List<Info> list = getAll();
+        int index = 0;
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getStream_url().equals(info.getStream_url())) {
+                index = i;
+                break;
+            } else {
+                index = -1;
+            }
+        }
+        Log.i("database info", index + " index");
+        Log.i("database info", "added info " + info.getTitle() + " to playlist " + playlist.getTitle());
         Cursor cursor = database.query(Resource.Info.TABLE_NAME, null, null, null, null, null, null);
-        cursor.move(list.indexOf(info));
+        cursor.move(index);
         contentValues.put(Resource.Info.PLAYLIST, cursor.getString(cursor.getColumnIndex(Resource.Info.PLAYLIST)) + "===" + playlist.getTitle());
         return database.update(Resource.Info.TABLE_NAME, contentValues, "id = " + list.indexOf(info), null);
     }
@@ -66,13 +79,42 @@ public class InfoDao implements Dao<Info> {
     public long deleteInfoFromPlaylist(Info info, Playlist playlist) {
         ContentValues contentValues = new ContentValues();
         List<Info> list = getAll();
+        int index = 0;
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getStream_url().equals(info.getStream_url())) {
+                index = i;
+                break;
+            }
+        }
+
 //        Info currentInfo = list.get(list.indexOf(info));
         Cursor cursor = database.query(Resource.Info.TABLE_NAME, null, null, null, null, null, null);
-        cursor.move(list.indexOf(info));
+        cursor.move(index);
         List<String> listOfPlaylists = StringGenerator.generateListOfPlaylists(cursor.getString(cursor.getColumnIndex(Resource.Info.PLAYLIST)));
         listOfPlaylists.remove(playlist.getTitle());
         contentValues.put(Resource.Info.PLAYLIST, StringGenerator.generatePlaylistStringFromList(listOfPlaylists));
         return database.update(Resource.Info.TABLE_NAME, contentValues, "id = " + list.indexOf(info), null);
+    }
+
+    public List<Info> getPlaylist(Playlist playlist) {
+        List<Info> allInfo = getAll();
+        List<Info> returnPlaylist = new ArrayList<>();
+        Cursor cursor = database.query(Resource.Info.TABLE_NAME, null, null, null, null, null, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                ArrayList<String> playlistList = StringGenerator.generateListOfPlaylists(cursor.getString(cursor.getColumnIndex(Resource.Info.PLAYLIST)));
+                for (int i = 0; i < playlistList.size(); i++) {
+                    if (playlistList.get(i).equals(playlist.getTitle())) {
+                        returnPlaylist.add(allInfo.get(cursor.getPosition()));
+                    }
+                }
+
+            } while (cursor.moveToNext());
+        }
+
+
+        return returnPlaylist;
     }
 
     private ContentValues parseInfo(Info info) {

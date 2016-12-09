@@ -23,7 +23,7 @@ import test.homework.nick.snp20.events_for_eventbus.view_to_player_events.EventT
 import test.homework.nick.snp20.events_for_eventbus.view_to_player_events.PlayerInfoEvent;
 import test.homework.nick.snp20.view.fragments.PlaylistsEditFragment;
 import test.homework.nick.snp20.view.fragments.SearchPlayerFragment;
-import test.homework.nick.snp20.utils.Commands;
+import test.homework.nick.snp20.utils.string_containers.Commands;
 
 public class MainActivity extends MActivity implements NavigationView.OnNavigationItemSelectedListener {
 

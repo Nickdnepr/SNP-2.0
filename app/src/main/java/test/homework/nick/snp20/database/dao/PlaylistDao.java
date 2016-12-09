@@ -32,6 +32,8 @@ public class PlaylistDao implements Dao<Playlist>{
         return parseCursor(cursor);
     }
 
+
+
     @Override
     public List<Playlist> parseCursor(Cursor cursor) {
         ArrayList<Playlist> list = new ArrayList<>();

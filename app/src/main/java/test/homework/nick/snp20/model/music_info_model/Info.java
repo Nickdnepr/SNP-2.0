@@ -1,5 +1,6 @@
 package test.homework.nick.snp20.model.music_info_model;
 
+import android.os.Parcelable;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.io.Serializable;

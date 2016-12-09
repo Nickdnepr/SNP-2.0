@@ -31,6 +31,7 @@
                 android:layout_marginLeft="@dimen/player_icon_horizontal_margin"
                 android:layout_marginRight="@dimen/player_icon_horizontal_margin"
                 android:src="@drawable/ic_queue_music_black_48dp"
+                android:id="@+id/show_playlist_button"
         />
 
         <ImageView
@@ -40,6 +41,7 @@
                 android:layout_marginBottom="@dimen/player_icon_vertical_margin"
                 android:layout_marginLeft="@dimen/player_icon_horizontal_margin"
                 android:layout_marginRight="@dimen/player_icon_horizontal_margin"
+                android:id="@+id/add_info_button"
                 android:src="@drawable/ic_add_circle_outline_black_48dp"/>
 
     </LinearLayout>

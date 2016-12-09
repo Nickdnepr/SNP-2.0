@@ -7,8 +7,8 @@ import android.content.Intent;
 import android.util.Log;
 import org.greenrobot.eventbus.EventBus;
 import test.homework.nick.snp20.events_for_eventbus.view_to_player_events.EventToService;
-import test.homework.nick.snp20.utils.Commands;
-import test.homework.nick.snp20.utils.Constants;
+import test.homework.nick.snp20.utils.string_containers.Commands;
+import test.homework.nick.snp20.utils.string_containers.Constants;
 
 /**
  * Created by Nick on 28.11.16.

@@ -5,7 +5,8 @@
         <item
                 android:title="Search music"
                 android:id="@+id/drawer_search"
-                android:icon="@drawable/ic_search_black_48dp"/>
+                android:icon="@drawable/ic_search_black_48dp"
+                android:checked="true"/>
         <item
                 android:title="Playlists"
                 android:id="@+id/drawer_playlist"

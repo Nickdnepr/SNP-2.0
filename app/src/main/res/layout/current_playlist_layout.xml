@@ -1,7 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
+    <android.support.v7.widget.Toolbar
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/toolbar_height"
+            android:background="@color/colorPrimary"
+            app:theme="@style/MyToolbarTheme"
+            android:id="@+id/toolbar"
+
+    >
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textColor="@color/white"
+                android:textSize="24sp"
+                android:gravity="center"
+                android:id="@+id/text_in_toolbar"
+                android:text="asdasd"/>
+    </android.support.v7.widget.Toolbar>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/toolbar_height"
+            android:layout_margin="5dp">
+
+        <EditText
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:id="@+id/search_playlist_edit_text"/>
+        <ImageView
+                android:layout_width="@dimen/toolbar_height"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_search_black_48dp"
+                android:id="@+id/search_playlist_button"/>
+
+    </LinearLayout>
+
+
+    <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/playlist_recycler_view"></android.support.v7.widget.RecyclerView>
 </LinearLayout>

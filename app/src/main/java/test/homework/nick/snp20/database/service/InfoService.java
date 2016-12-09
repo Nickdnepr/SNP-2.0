@@ -5,6 +5,7 @@ import test.homework.nick.snp20.database.dao.InfoDao;
 import test.homework.nick.snp20.database.service.core.OpenDBService;
 import test.homework.nick.snp20.database.service.core.Service;
 import test.homework.nick.snp20.model.music_info_model.Info;
+import test.homework.nick.snp20.model.playlist_model.Playlist;
 
 import java.util.List;
 
@@ -34,6 +35,19 @@ public class InfoService extends OpenDBService implements Service<Info> {
 
     }
 
+    public long addInfoToPlaylist(Info info, Playlist playlist) {
+        try {
+            if (!isOpen()) {
+                open(context);
+            }
+            return new InfoDao(getDatabase()).addInfoToPlaylist(info, playlist);
+        } finally {
+            if (isOpen()) {
+                close();
+            }
+        }
+    }
+
     @Override
     public List<Info> getAll() {
         try {
@@ -41,6 +55,19 @@ public class InfoService extends OpenDBService implements Service<Info> {
                 open(context);
             }
             return new InfoDao(getDatabase()).getAll();
+        } finally {
+            if (isOpen()) {
+                close();
+            }
+        }
+    }
+
+    public List<Info> getPlaylist(Playlist playlist) {
+        try {
+            if (!isOpen()) {
+                open(context);
+            }
+            return new InfoDao(getDatabase()).getPlaylist(playlist);
         } finally {
             if (isOpen()) {
                 close();

@@ -13,8 +13,8 @@ import org.greenrobot.eventbus.Subscribe;
 import test.homework.nick.snp20.events_for_eventbus.view_to_player_events.*;
 import test.homework.nick.snp20.model.music_info_model.Info;
 import test.homework.nick.snp20.notific.NotificationHelper;
-import test.homework.nick.snp20.utils.Commands;
-import test.homework.nick.snp20.utils.Constants;
+import test.homework.nick.snp20.utils.string_containers.Commands;
+import test.homework.nick.snp20.utils.string_containers.Constants;
 
 import java.io.IOException;
 import java.util.List;

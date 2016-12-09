@@ -1,9 +1,11 @@
 package test.homework.nick.snp20.view.fragments;
 
+import android.app.Dialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,15 +14,20 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 import test.homework.nick.snp20.R;
 import test.homework.nick.snp20.database.MDBHelper;
+import test.homework.nick.snp20.database.service.InfoService;
 import test.homework.nick.snp20.database.service.PlaylistService;
+import test.homework.nick.snp20.events_for_eventbus.dialog_events.DialogEvent;
+import test.homework.nick.snp20.events_for_eventbus.dialog_events.PlaylistDialogEvent;
 import test.homework.nick.snp20.model.playlist_model.Playlist;
-import test.homework.nick.snp20.utils.MGridAdapter;
+import test.homework.nick.snp20.utils.string_containers.Commands;
+import test.homework.nick.snp20.utils.adapters.MGridAdapter;
 import test.homework.nick.snp20.view.ViewModel;
 import test.homework.nick.snp20.view.fragments.dialog_fragments.CreateNewPlaylistDialog;
+import test.homework.nick.snp20.view.fragments.dialog_fragments.PlaylistDialogFragment;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,6 +40,8 @@ public class PlaylistsEditFragment extends Fragment implements ViewModel {
     private ImageView searchButton;
     private MDBHelper mdbHelper;
     private CreateNewPlaylistDialog createNewPlaylistDialog;
+    private List<Playlist> playlistList;
+    private MGridAdapter mGridAdapter;
 
     @Nullable
     @Override
@@ -43,7 +52,7 @@ public class PlaylistsEditFragment extends Fragment implements ViewModel {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-//        EventBus.getDefault().register(this);
+        EventBus.getDefault().register(this);
         initControlElements();
         setupControlElements();
     }
@@ -58,12 +67,19 @@ public class PlaylistsEditFragment extends Fragment implements ViewModel {
 
     @Override
     public void setupControlElements() {
-        List<Playlist> list = new PlaylistService(getContext()).getAll();
+        getList();
+
+
+        setupGridView();
+    }
+
+    private void getList() {
+        List list = new PlaylistService(getContext()).getAll();
         list.add(0, new Playlist("add new", null));
-        MGridAdapter mGridAdapter = new MGridAdapter(getActivity(), list);
+        playlistList = list;
+        mGridAdapter = new MGridAdapter(getActivity(), playlistList);
         gridView.setAdapter(mGridAdapter);
         mGridAdapter.notifyDataSetChanged();
-        setupGridView();
     }
 
     private void setupGridView() {
@@ -74,18 +90,32 @@ public class PlaylistsEditFragment extends Fragment implements ViewModel {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (position==0){
-//                    createNewPlaylistDialog.setStyle(DialogFragment.STYLE_NO_FRAME, R.style.MDialog);
-
+                if (position == 0) {
                     createNewPlaylistDialog.show(getFragmentManager(), "create new playlist dialog");
+                }else {
+                    PlaylistDialogFragment playlistDialogFragment = new PlaylistDialogFragment();
+                    playlistDialogFragment.setStyle(DialogFragment.STYLE_NO_TITLE, R.style.MDialog);
+                    playlistDialogFragment.show(getFragmentManager(), "tag");
+                    EventBus.getDefault().postSticky(new PlaylistDialogEvent(new InfoService(getContext()).getPlaylist(playlistList.get(position)), playlistList.get(position)));
                 }
+
+                Log.i("grid view", position + "");
             }
         });
+    }
+
+    @Subscribe
+    public void onEvent(DialogEvent dialogEvent) {
+        if (dialogEvent.getMessage().equals(Commands.NEW_PLAYLIST_CREATED)) {
+            getList();
+            mGridAdapter.notifyDataSetChanged();
+            Log.i("playlist", dialogEvent.getMessage());
+        }
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-//        EventBus.getDefault().unregister(this);
+        EventBus.getDefault().unregister(this);
     }
 }
