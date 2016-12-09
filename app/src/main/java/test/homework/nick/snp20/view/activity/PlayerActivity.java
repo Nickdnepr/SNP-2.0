@@ -185,16 +185,12 @@ public class PlayerActivity extends MActivity {
     }
 
     @Subscribe
-    public void onEvent(AddInfoToPlaylistDialogEvent addInfoToPlaylistDialogEvent){
+    public void onEvent(AddInfoToPlaylistDialogEvent addInfoToPlaylistDialogEvent) {
         //checking current info for existing in the chosen playlist
-        if (!new InfoService(this).getPlaylist(addInfoToPlaylistDialogEvent.getPlaylist()).contains(reservePlaylist.getPlaylist().get(reservePlaylist.getIndex()))){
-            //checking current info for existing in database
-            if (!new InfoService(this).getPlaylist(new Playlist(Resource.Playlist.ALL_MUSIC_PLAYLIST_TITLE, null)).contains(reservePlaylist.getPlaylist().get(reservePlaylist.getIndex()))){
-                new InfoService(this).save(reservePlaylist.getPlaylist().get(reservePlaylist.getIndex()));
-            }
-            new InfoService(this).addInfoToPlaylist(reservePlaylist.getPlaylist().get(reservePlaylist.getIndex()), addInfoToPlaylistDialogEvent.getPlaylist());
 
-        }
+        Log.i("database add", reservePlaylist.getPlaylist().get(reservePlaylist.getIndex()).getTitle());
+        Log.i("database add", addInfoToPlaylistDialogEvent.getPlaylist().getTitle());
+        new InfoService(this).addInfoToPlaylist(reservePlaylist.getPlaylist().get(reservePlaylist.getIndex()), addInfoToPlaylistDialogEvent.getPlaylist());
     }
 
     @Override

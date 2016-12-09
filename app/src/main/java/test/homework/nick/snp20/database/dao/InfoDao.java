@@ -48,7 +48,10 @@ public class InfoDao implements Dao<Info> {
                         cursor.getString(cursor.getColumnIndex(Resource.Info.STREAM_URL)),
                         cursor.getString(cursor.getColumnIndex(Resource.Info.PATH_TO_FILE)),
                         cursor.getString(cursor.getColumnIndex(Resource.Info.ARTWORK_URL))
+
                 );
+
+                Log.i("database check cursor", cursor.getInt(cursor.getColumnIndex(Resource.Info.ID)) + "  " + cursor.getString(cursor.getColumnIndex(Resource.Info.TITLE)) + "  " + cursor.getString(cursor.getColumnIndex(Resource.Info.PLAYLIST)));
                 list.add(info);
             } while (cursor.moveToNext());
         }
@@ -59,21 +62,36 @@ public class InfoDao implements Dao<Info> {
     public long addInfoToPlaylist(Info info, Playlist playlist) {
         ContentValues contentValues = new ContentValues();
         List<Info> list = getAll();
-        int index = 0;
+        boolean contains = false;
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i).getStream_url().equals(info.getStream_url())) {
-                index = i;
-                break;
-            } else {
-                index = -1;
+                Log.i("database check", "already exists");
+                contains = true;
             }
         }
-        Log.i("database info", index + " index");
-        Log.i("database info", "added info " + info.getTitle() + " to playlist " + playlist.getTitle());
+
+        if (!contains) {
+            save(info);
+        }
         Cursor cursor = database.query(Resource.Info.TABLE_NAME, null, null, null, null, null, null);
-        cursor.move(index);
-        contentValues.put(Resource.Info.PLAYLIST, cursor.getString(cursor.getColumnIndex(Resource.Info.PLAYLIST)) + "===" + playlist.getTitle());
-        return database.update(Resource.Info.TABLE_NAME, contentValues, "id = " + list.indexOf(info), null);
+        if (cursor.moveToFirst()) {
+            do {
+                ArrayList<String> playlistList = StringGenerator.generateListOfPlaylists(cursor.getString(cursor.getColumnIndex(Resource.Info.PLAYLIST)));
+                if (cursor.getString(cursor.getColumnIndex(Resource.Info.STREAM_URL)).equals(info.getStream_url())) {
+                    for (int i = 0; i < playlistList.size(); i++) {
+                        if (!playlistList.contains(playlist.getTitle())) {
+                            contentValues.put(Resource.Info.PLAYLIST, cursor.getString(cursor.getColumnIndex(Resource.Info.PLAYLIST)) + "===" + playlist.getTitle());
+                            Log.i("database check", "adding to playlist " + playlist.getTitle());
+                            Log.i("database check", cursor.getString(cursor.getColumnIndex(Resource.Info.PLAYLIST)) + "===" + playlist.getTitle());
+                            Log.i("database check id", cursor.getPosition() + 1 + "");
+                            return database.update(Resource.Info.TABLE_NAME, contentValues, "id = ?", new String[]{cursor.getPosition() + 1+""});
+                        }
+                    }
+                }
+            } while (cursor.moveToNext());
+        }
+
+        return 0;
     }
 
     public long deleteInfoFromPlaylist(Info info, Playlist playlist) {
@@ -93,7 +111,7 @@ public class InfoDao implements Dao<Info> {
         List<String> listOfPlaylists = StringGenerator.generateListOfPlaylists(cursor.getString(cursor.getColumnIndex(Resource.Info.PLAYLIST)));
         listOfPlaylists.remove(playlist.getTitle());
         contentValues.put(Resource.Info.PLAYLIST, StringGenerator.generatePlaylistStringFromList(listOfPlaylists));
-        return database.update(Resource.Info.TABLE_NAME, contentValues, "id = " + list.indexOf(info), null);
+        return database.update(Resource.Info.TABLE_NAME, contentValues, "id = " + index, null);
     }
 
     public List<Info> getPlaylist(Playlist playlist) {
@@ -106,6 +124,7 @@ public class InfoDao implements Dao<Info> {
                 ArrayList<String> playlistList = StringGenerator.generateListOfPlaylists(cursor.getString(cursor.getColumnIndex(Resource.Info.PLAYLIST)));
                 for (int i = 0; i < playlistList.size(); i++) {
                     if (playlistList.get(i).equals(playlist.getTitle())) {
+                        Log.i("database playlist", playlistList.get(i));
                         returnPlaylist.add(allInfo.get(cursor.getPosition()));
                     }
                 }

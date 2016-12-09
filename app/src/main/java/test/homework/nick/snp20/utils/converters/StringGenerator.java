@@ -1,5 +1,6 @@
 package test.homework.nick.snp20.utils.converters;
 
+import android.util.Log;
 import test.homework.nick.snp20.utils.string_containers.Constants;
 
 import java.util.ArrayList;
@@ -40,6 +41,10 @@ public class StringGenerator {
 
     public static ArrayList<String> generateListOfPlaylists(String lists) {
         String[] arr = lists.split("===");
+        Log.i("string generator", lists);
+        for (int i=0; i<arr.length; i++){
+            Log.i("string generator arr", arr[i]);
+        }
         return new ArrayList<>(Arrays.asList(arr));
     }
 

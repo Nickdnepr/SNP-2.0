@@ -94,9 +94,13 @@ public class PlaylistsEditFragment extends Fragment implements ViewModel {
                     createNewPlaylistDialog.show(getFragmentManager(), "create new playlist dialog");
                 }else {
                     PlaylistDialogFragment playlistDialogFragment = new PlaylistDialogFragment();
+                    Bundle bundle = new Bundle();
+                    bundle.putString("playlist", playlistList.get(position).getTitle());
+                    playlistDialogFragment.setArguments(bundle);
                     playlistDialogFragment.setStyle(DialogFragment.STYLE_NO_TITLE, R.style.MDialog);
                     playlistDialogFragment.show(getFragmentManager(), "tag");
-                    EventBus.getDefault().postSticky(new PlaylistDialogEvent(new InfoService(getContext()).getPlaylist(playlistList.get(position)), playlistList.get(position)));
+
+//                    EventBus.getDefault().postSticky(new PlaylistDialogEvent(new InfoService(getContext()).getPlaylist(playlistList.get(position)), playlistList.get(position)));
                 }
 
                 Log.i("grid view", position + "");
