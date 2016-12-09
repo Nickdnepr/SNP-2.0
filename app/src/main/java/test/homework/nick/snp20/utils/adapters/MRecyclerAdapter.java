@@ -1,4 +1,4 @@
-package test.homework.nick.snp20.utils;
+package test.homework.nick.snp20.utils.adapters;
 
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -10,6 +10,7 @@ import org.greenrobot.eventbus.EventBus;
 import test.homework.nick.snp20.R;
 import test.homework.nick.snp20.events_for_eventbus.view_to_player_events.ListEvent;
 import test.homework.nick.snp20.model.music_info_model.Info;
+import test.homework.nick.snp20.utils.StringGenerator;
 
 import java.util.List;
 

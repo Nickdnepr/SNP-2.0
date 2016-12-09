@@ -1,4 +1,4 @@
-package test.homework.nick.snp20.utils;
+package test.homework.nick.snp20.utils.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;

@@ -1,4 +1,4 @@
-package test.homework.nick.snp20.utils;
+package test.homework.nick.snp20.utils.string_containers;
 
 /**
  * Created by Nick on 04.11.16.
@@ -17,6 +17,8 @@ public class Commands {
     public static String NOTIFICATION_START_STOP_COMMAND = "notification start stop";
     public static String RANDOMIZE_COMMAND = "make random playlist";
     public static String NEED_SERVICE_START = "start service now";
+
+    public static String NEW_PLAYLIST_CREATED = "new playlist created";
 
 
 }

@@ -1,4 +1,4 @@
-package test.homework.nick.snp20.utils;
+package test.homework.nick.snp20.utils.string_containers;
 
 /**
  * Created by Nick on 29.08.16.

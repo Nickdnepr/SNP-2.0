@@ -1,4 +1,6 @@
-package test.homework.nick.snp20.utils;
+package test.homework.nick.snp20.utils.converters;
+
+import test.homework.nick.snp20.utils.string_containers.Constants;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,20 +38,28 @@ public class StringGenerator {
         return answer.toString();
     }
 
-    public static ArrayList<String> generateListOfPlaylists(String lists){
+    public static ArrayList<String> generateListOfPlaylists(String lists) {
         String[] arr = lists.split("===");
         return new ArrayList<>(Arrays.asList(arr));
     }
 
-    public static String generatePlaylistStringFromList(List<String> list){
+    public static String generatePlaylistStringFromList(List<String> list) {
         StringBuilder s = new StringBuilder();
-        for (int i=0; i<list.size(); i++){
+        for (int i = 0; i < list.size(); i++) {
             s.append(list.get(i));
-            if (list.size()-i!=1){
+            if (list.size() - i != 1) {
                 s.append("===");
             }
         }
 
         return s.toString();
+    }
+
+    public static boolean containsNotAllowedCharacters(String s) {
+        if (s.contains("===") || s.contains(",") || s.contains(".") || s.contains("&") || s.contains("#") || s.contains("|")) {
+            return true;
+        }
+
+        return false;
     }
 }

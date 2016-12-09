@@ -1,4 +1,4 @@
-package test.homework.nick.snp20.utils;
+package test.homework.nick.snp20.utils.converters;
 
 /**
  * Created by Nick on 13.11.16.
