@@ -69,6 +69,7 @@ public class MRecyclerAdapter extends RecyclerView.Adapter<MRecyclerAdapter.MVie
         @Override
         public void onClick(View v) {
             Log.i(TAG, "clicked, id="+getAdapterPosition());
+            Log.i("debug event", new ListEvent(playlist, getAdapterPosition()).getPlaylist().toString());
             EventBus.getDefault().post(new ListEvent(playlist, getAdapterPosition()));
         }
     }

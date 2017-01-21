@@ -99,7 +99,6 @@ public class PlayerService extends Service implements MediaPlayer.OnPreparedList
     @Subscribe
     public void onEvent(ListEvent listEvent) {
         Log.i(TAG, "listEvent  received");
-//        initPlayer();
         playlist = listEvent.getPlaylist();
         index = listEvent.getIndex();
         Info info = playlist.get(index);

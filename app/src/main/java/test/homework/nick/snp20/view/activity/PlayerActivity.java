@@ -1,9 +1,12 @@
 package test.homework.nick.snp20.view.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewParent;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -17,9 +20,11 @@ import test.homework.nick.snp20.events_for_eventbus.dialog_events.AddInfoToPlayl
 import test.homework.nick.snp20.events_for_eventbus.view_to_player_events.*;
 import test.homework.nick.snp20.model.music_info_model.Info;
 import test.homework.nick.snp20.model.playlist_model.Playlist;
+import test.homework.nick.snp20.utils.adapters.MViewPagerAdapter;
 import test.homework.nick.snp20.utils.string_containers.Commands;
 import test.homework.nick.snp20.utils.converters.ProgressToMillsConverter;
 import test.homework.nick.snp20.utils.converters.StringGenerator;
+import test.homework.nick.snp20.utils.string_containers.Constants;
 import test.homework.nick.snp20.view.fragments.dialog_fragments.AddInfoToPlaylistDialog;
 
 /**
@@ -46,13 +51,21 @@ public class PlayerActivity extends MActivity {
     private ImageView startStopButton;
     private ImageView nextButton;
     private ImageView repeatButton;
+    private ViewPager pager;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.player_activity_layout);
+        try {
+            reservePlaylist = (ListEvent) getIntent().getSerializableExtra(Constants.LIST_INFO_EXTRA_TITLE);
+        } catch (Exception e) {
+            Log.i("debug event", "error");
+            e.printStackTrace();
+        }
         initControlElements();
         setupControlElements();
+
     }
 
     @Override
@@ -86,6 +99,7 @@ public class PlayerActivity extends MActivity {
         startStopButton = (ImageView) findViewById(R.id.player_play_stop_button);
         nextButton = (ImageView) findViewById(R.id.player_next_button);
         repeatButton = (ImageView) findViewById(R.id.player_repeat_button);
+        pager = (ViewPager) findViewById(R.id.view_pager);
     }
 
     @Override
@@ -171,6 +185,11 @@ public class PlayerActivity extends MActivity {
                 dialog.show(getSupportFragmentManager(), "add_info_dialog");
             }
         });
+
+
+        MViewPagerAdapter mViewPagerAdapter = new MViewPagerAdapter(getSupportFragmentManager(), reservePlaylist.getPlaylist());
+        pager.setAdapter(mViewPagerAdapter);
+        mViewPagerAdapter.notifyDataSetChanged();
     }
 
     @Subscribe
@@ -224,5 +243,13 @@ public class PlayerActivity extends MActivity {
         } else {
             startStopButton.setImageResource(R.drawable.ic_play_circle_filled_black_48dp);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Intent intent = new Intent(PlayerActivity.this, MainActivity.class);
+        intent.putExtra(Constants.BROADCAST_INTENT_COMMAND_EXTRA_TITLE, reservePlaylist);
+        startActivity(intent);
     }
 }

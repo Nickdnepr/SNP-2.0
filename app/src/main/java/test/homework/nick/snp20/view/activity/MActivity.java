@@ -50,6 +50,7 @@ public abstract class MActivity extends AppCompatActivity implements ViewModel{
     @Subscribe
     public void onEvent(ListEvent listEvent) {
         reservePlaylist = listEvent;
+        Log.i("debug event", reservePlaylist.getPlaylist().toString());
         if (!serviceAlive) {
             startPlayerService(true);
         }
@@ -104,7 +105,7 @@ public abstract class MActivity extends AppCompatActivity implements ViewModel{
     @Override
     protected void onStop() {
         super.onStop();
-        EventBus.getDefault().post(new ActivityInformationEvent(reservePlaylist, musicPlaying, serviceAlive, playerActive));
+        EventBus.getDefault().postSticky(new ActivityInformationEvent(reservePlaylist, musicPlaying, serviceAlive, playerActive));
     }
 
     @Override

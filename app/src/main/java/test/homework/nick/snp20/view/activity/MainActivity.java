@@ -20,7 +20,9 @@ import org.greenrobot.eventbus.Subscribe;
 import test.homework.nick.snp20.R;
 import test.homework.nick.snp20.events_for_eventbus.view_to_player_events.EventToActivity;
 import test.homework.nick.snp20.events_for_eventbus.view_to_player_events.EventToService;
+import test.homework.nick.snp20.events_for_eventbus.view_to_player_events.ListEvent;
 import test.homework.nick.snp20.events_for_eventbus.view_to_player_events.PlayerInfoEvent;
+import test.homework.nick.snp20.utils.string_containers.Constants;
 import test.homework.nick.snp20.view.fragments.PlaylistsEditFragment;
 import test.homework.nick.snp20.view.fragments.SearchPlayerFragment;
 import test.homework.nick.snp20.utils.string_containers.Commands;
@@ -167,13 +169,22 @@ public class MainActivity extends MActivity implements NavigationView.OnNavigati
         bottom_panel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.i("debug event", reservePlaylist.toString());
                 Intent intent = new Intent(MainActivity.this, PlayerActivity.class);
+                intent.putExtra(Constants.LIST_INFO_EXTRA_TITLE, new ListEvent(reservePlaylist.getPlaylist(), reservePlaylist.getIndex()));
                 startActivity(intent);
+
             }
         });
 
         if (bottomSheetExtended) {
             openSheet();
+        }
+
+        try {
+            reservePlaylist= (ListEvent) getIntent().getSerializableExtra(Constants.LIST_INFO_EXTRA_TITLE);
+        }catch (Exception e){
+
         }
     }
 
@@ -246,7 +257,7 @@ public class MainActivity extends MActivity implements NavigationView.OnNavigati
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.drawer_search:
                 changeFragment(searchPlayerFragment);
                 break;

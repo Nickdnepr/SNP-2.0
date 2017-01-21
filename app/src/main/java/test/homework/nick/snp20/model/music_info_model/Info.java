@@ -1,21 +1,20 @@
 package test.homework.nick.snp20.model.music_info_model;
 
 import android.os.Parcelable;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 
 import java.io.Serializable;
 
 /**
  * Created by Nick_dnepr on 20.05.2015.
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
+
 public class Info implements Serializable {
 
 
     private String title;
     private int duration;
     private User user;
-
     private String stream_url;
     private boolean downloaded;
     private String path_to_file;

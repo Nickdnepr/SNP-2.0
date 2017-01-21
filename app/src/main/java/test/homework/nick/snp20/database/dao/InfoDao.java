@@ -3,14 +3,19 @@ package test.homework.nick.snp20.database.dao;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Environment;
 import android.util.Log;
 import test.homework.nick.snp20.database.Resource;
 import test.homework.nick.snp20.database.dao.core.Dao;
 import test.homework.nick.snp20.model.music_info_model.Info;
 import test.homework.nick.snp20.model.music_info_model.User;
 import test.homework.nick.snp20.model.playlist_model.Playlist;
+import test.homework.nick.snp20.utils.DownloadService;
 import test.homework.nick.snp20.utils.converters.StringGenerator;
+import test.homework.nick.snp20.utils.string_containers.Constants;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -84,7 +89,7 @@ public class InfoDao implements Dao<Info> {
                             Log.i("database check", "adding to playlist " + playlist.getTitle());
                             Log.i("database check", cursor.getString(cursor.getColumnIndex(Resource.Info.PLAYLIST)) + "===" + playlist.getTitle());
                             Log.i("database check id", cursor.getPosition() + 1 + "");
-                            return database.update(Resource.Info.TABLE_NAME, contentValues, "id = ?", new String[]{cursor.getPosition() + 1+""});
+                            return database.update(Resource.Info.TABLE_NAME, contentValues, "id = ?", new String[]{cursor.getPosition() + 1 + ""});
                         }
                     }
                 }
@@ -92,6 +97,31 @@ public class InfoDao implements Dao<Info> {
         }
 
         return 0;
+    }
+
+    public long downloadInfoToSdcard(Info info) {
+        ContentValues contentValues = new ContentValues();
+        List<Info> downloadedList = getPlaylist(new Playlist(Resource.Playlist.DOWNLOADED_MUSIC_PLAYLIST_TITLE, null));
+
+        for (int i = 0; i < downloadedList.size(); i++) {
+            if (info.getStream_url().equals(downloadedList.get(i).getStream_url())) {
+                return 0;
+            }
+        }
+
+        File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC);
+        File myFile = new File(dir, info.getTitle() + ".mp3");
+
+        try {
+            myFile.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        DownloadService.downloadFile(info.getStream_url() + Constants.USER_ID, myFile);
+
+
+        return addInfoToPlaylist(info, new Playlist(Resource.Playlist.DOWNLOADED_MUSIC_PLAYLIST_TITLE, null));
     }
 
     public long deleteInfoFromPlaylist(Info info, Playlist playlist) {

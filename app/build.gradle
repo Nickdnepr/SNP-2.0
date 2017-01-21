@@ -39,6 +39,8 @@ dependencies {
     compile 'org.greenrobot:eventbus:3.0.0'
     compile 'com.github.andkulikov:transitions-everywhere:1.4.0'
     compile 'org.springframework.android:spring-android-rest-template:1.0.1.RELEASE'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.3.2'
+
+
+    compile 'com.github.bumptech.glide:glide:3.6.0'
     compile group: 'com.google.code.gson', name: 'gson', version: '1.7.2'
 }
